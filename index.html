@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="theme-color" content="#FF9F0A">
-<title>Plan de Menú y Suplementación — JM v2</title>
+<title>Plan de Menú y Suplementación — JM v3</title>
 <style>
 :root{--glass:rgba(255,255,255,.06);--glass2:rgba(255,255,255,.04);--gbd:rgba(255,255,255,.1);--bg:#000;--t:rgba(255,255,255,.92);--t2:rgba(255,255,255,.65);--t3:rgba(255,255,255,.38);--bl:#0A84FF;--bll:#60a5fa;--blb:rgba(59,130,246,.12);--rd:#FF453A;--rdb:rgba(255,69,58,.1);--yw:#FF9F0A;--ywl:#fbbf24;--ywb:rgba(255,159,10,.1);--gn:#30D158;--gnb:rgba(48,209,88,.12);--pr:#BF5AF2;--in:#5E5CE6;--inb:rgba(94,92,230,.12);--or:#FF9F0A;--orb:rgba(249,115,22,.1);--tl:#64D2FF;--r:22px;--r2:16px;--r3:12px}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -159,8 +159,9 @@ button,select{font-family:inherit;cursor:pointer;font-size:16px}
 <div class="hdr">
   <div id="saveInd" style="position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--gn);opacity:0;transition:opacity .3s;pointer-events:none;z-index:99">💾 Guardado</div>
   <div class="hdr-row">
-    <div class="hdr-t">⚡ <span>Plan de Menú y Suplementación</span><small>José María · v2</small></div>
+    <div class="hdr-t">⚡ <span>Plan de Menú y Suplementación</span><small id="appVer">José María · v3</small></div>
     <div class="hdr-actions">
+      <button class="hdr-abtn" onclick="printWeek()" style="background:rgba(10,132,255,.1);color:var(--bl)">🖨️ Imprimir</button>
       <button class="hdr-abtn" onclick="addWeek()">+ Semana</button>
       <button class="hdr-abtn" onclick="if(S.totalW>1&&confirm('¿Eliminar sem '+S.totalW+'?')){delete WP[S.totalW];S.totalW--;if(S.w>S.totalW)S.w=S.totalW;save();rebuildWsel();renderPlanner();renderWeek()}">− Sem</button>
       <button class="hdr-abtn" onclick="if(confirm('¿Reset total?')){try{localStorage.removeItem('aum_wp');localStorage.removeItem('aum_s')}catch(e){}location.reload()}">Reset</button>
@@ -184,6 +185,7 @@ button,select{font-family:inherit;cursor:pointer;font-size:16px}
 </div></div>
 <div class="modal" id="modal"><div class="mo-s"><div class="mo-h"><h3 id="mT"></h3><button class="mo-x" id="mX">✕</button></div><div id="mO"></div></div></div>
 <script>
+const APP_V="v3",APP_DATE="14/04/2026";
 const DN=["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"],DL=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
 
 // ============ RECETAS COMPLETAS ============
@@ -265,7 +267,18 @@ const PROTS_B=["3 huevos L","2 huevos L + 20g queso tierno","2 huevos L + 25g ja
 
 let S={v:"week",w:1,oDay:-1,totalW:12};
 const WP={};
-function newWeek(w){return DN.map((_,i)=>{const p=i<5?2:1;const fl=pilaFilter(LU,p);const fd=pilaFilter(DI,p);return{pila:p,sp:i===0||i===2||i===4?"bici":i===1||i===3?"gym":"descanso",hr:2,bf:i%3,lu:fl.length?LU.indexOf(fl[i%fl.length]):i%9,di:fd.length?DI.indexOf(fd[i%fd.length]):(i+3)%9,rec:null,ck:{}}})}
+function newWeek(w){const days=[];const usedLU=new Set(),usedDI=new Set();
+for(let i=0;i<7;i++){const p=i<5?2:1;
+const fl=pilaFilter(LU,p),fd=pilaFilter(DI,p);
+let lu=0,di=0,picked=false;
+for(const m of fl){const idx=LU.indexOf(m);if(!usedLU.has(idx)){lu=idx;picked=true;break}}
+if(!picked&&fl.length)lu=LU.indexOf(fl[((w*7+i)*13)%fl.length]);
+usedLU.add(lu);picked=false;
+for(const m of fd){const idx=DI.indexOf(m);if(!usedDI.has(idx)){di=idx;picked=true;break}}
+if(!picked&&fd.length)di=DI.indexOf(fd[((w*7+i)*17)%fd.length]);
+usedDI.add(di);
+days.push({pila:p,sp:i===0||i===2||i===4?"bici":i===1||i===3?"gym":"descanso",hr:2,bf:i%3,lu,di,rec:null,ck:{}});}
+return days;}
 function initWP(){for(let w=1;w<=S.totalW;w++)WP[w]=newWeek(w)}
 function save(){try{localStorage.setItem("aum_wp",JSON.stringify(WP));localStorage.setItem("aum_s",JSON.stringify({w:S.w,totalW:S.totalW}));const ind=document.getElementById("saveInd");if(ind){ind.style.opacity="1";clearTimeout(ind._t);ind._t=setTimeout(()=>ind.style.opacity="0",1200)}}catch(e){}}
 function load(){try{const wp=localStorage.getItem("aum_wp");const s=localStorage.getItem("aum_s");if(s){const sd=JSON.parse(s);S.w=sd.w||1;S.totalW=sd.totalW||12}if(wp){const d=JSON.parse(wp);for(let w in d){WP[w]=d[w];WP[w].forEach(day=>{if(!day.ck)day.ck={};if(!day.rec)day.rec=null})}S.totalW=Math.max(S.totalW,Object.keys(WP).length)}else{initWP()}return!!wp}catch(e){initWP();return false}}
@@ -286,8 +299,30 @@ function renderPlanner(){const d=WP[S.w];$("plannerW").innerHTML=`<div class="pl
 function setPila(i,v){WP[S.w][i].pila=v;autoM(i);save();renderPlanner();renderWeek()}
 function setSport(i,v){WP[S.w][i].sp=v;save();renderPlanner();renderWeek()}
 function setHr(i,v){WP[S.w][i].hr=v;save();renderPlanner();renderWeek()}
-function autoM(i){const d=WP[S.w][i],p=d.pila;const fl=pilaFilter(LU,p);const fd=pilaFilter(DI,p);if(fl.length)d.lu=LU.indexOf(fl[i%fl.length]);if(fd.length)d.di=DI.indexOf(fd[i%fd.length])}
-function validateMeals(){const days=WP[S.w];if(!days)return;let changed=false;days.forEach((d,i)=>{const validLU=pilaFilter(LU,d.pila);const validDI=pilaFilter(DI,d.pila);if(validLU.length&&!validLU.includes(LU[d.lu])){d.lu=LU.indexOf(validLU[i%validLU.length]);changed=true}if(validDI.length&&!validDI.includes(DI[d.di])){d.di=DI.indexOf(validDI[i%validDI.length]);changed=true}});if(changed)save()}
+function autoM(i){
+const d=WP[S.w][i],p=d.pila;
+const fl=pilaFilter(LU,p),fd=pilaFilter(DI,p);
+const usedLU=new Set(),usedDI=new Set();
+WP[S.w].forEach((day,j)=>{if(j!==i){usedLU.add(day.lu);usedDI.add(day.di)}});
+let picked=false;
+for(const m of fl){const idx=LU.indexOf(m);if(!usedLU.has(idx)){d.lu=idx;picked=true;break}}
+if(!picked&&fl.length)d.lu=LU.indexOf(fl[((S.w*7+i)*13)%fl.length]);
+picked=false;
+for(const m of fd){const idx=DI.indexOf(m);if(!usedDI.has(idx)){d.di=idx;picked=true;break}}
+if(!picked&&fd.length)d.di=DI.indexOf(fd[((S.w*7+i)*17)%fd.length]);
+}
+function validateMeals(){const days=WP[S.w];if(!days)return;let changed=false;
+days.forEach((d,i)=>{
+const vLU=pilaFilter(LU,d.pila),vDI=pilaFilter(DI,d.pila);
+if(vLU.length&&!vLU.includes(LU[d.lu])){
+const used=new Set();days.forEach((dy,j)=>{if(j!==i)used.add(dy.lu)});
+let picked=false;for(const m of vLU){const idx=LU.indexOf(m);if(!used.has(idx)){d.lu=idx;picked=true;break}}
+if(!picked)d.lu=LU.indexOf(vLU[((S.w*7+i)*13)%vLU.length]);changed=true}
+if(vDI.length&&!vDI.includes(DI[d.di])){
+const used=new Set();days.forEach((dy,j)=>{if(j!==i)used.add(dy.di)});
+let picked=false;for(const m of vDI){const idx=DI.indexOf(m);if(!used.has(idx)){d.di=idx;picked=true;break}}
+if(!picked)d.di=DI.indexOf(vDI[((S.w*7+i)*17)%vDI.length]);changed=true}
+});if(changed)save()}
 
 function renderWeek(){validateMeals();const w=S.w,days=WP[w];let h="";days.forEach((d,i)=>{const op=S.oDay===i,dn=(w-1)*7+i+1,pC=d.pila<=1?"p1":d.pila===2?"p2":d.pila===3?"p3":"p4",sC=d.sp==="bici"?"bici":d.sp==="gym"?"gym":"desc",sL=d.sp==="bici"?"🚴 "+d.hr+"h":d.sp==="gym"?"🏋️":"😌";
 h+=`<div class="dc glass"><div class="dc-h" onclick="togDay(${i})"><div class="dc-dy">${DL[i]} <span>Día ${dn}</span></div><div class="dc-bg"><span class="badge ${pC}">${dots(d.pila)}</span><span class="badge ${sC}">${sL}</span><span class="dc-arr ${op?'o':''}">›</span></div></div><div class="dc-b ${op?'o':''}">`;
@@ -322,7 +357,12 @@ function togDay(i){S.oDay=S.oDay===i?-1:i;renderWeek()}
 function togRec(i,t){const d=WP[S.w][i];d.rec=d.rec===t?null:t;renderWeek()}
 
 let swC=null;
-function pilaFilter(meals,pila){return meals.filter(m=>!m.e||( pila<=1?m.e<=2 : pila===2?m.e<=2 : pila===3?m.e>=2 : m.e>=3 ))}
+function pilaFilter(meals,pila){
+const f=meals.filter(m=>!m.e||(pila<=1?m.e<=1:pila===2?m.e<=2:pila===3?m.e>=2:m.e>=3));
+if(f.length)return f;
+const f2=meals.filter(m=>!m.e||(pila<=2?m.e<=2:m.e>=2));
+return f2.length?f2:meals;
+}
 function openSw(di,tp){swC={di,tp};const allMs=tp==="bf"?BF:tp==="lu"?LU:DI;const pila=WP[S.w][di].pila;const ms=tp==="bf"?allMs:pilaFilter(allMs,pila);const cur=WP[S.w][di][tp];const lb=tp==="bf"?"desayuno":tp==="lu"?"comida":"cena";$("mT").textContent="Cambiar "+lb+" "+dots(pila);let h="";if(!ms.length){h=`<div style="padding:20px;text-align:center;color:var(--t3)">No hay platos para esta pila. Ajusta la pila del día.</div>`}ms.forEach(m=>{const origIdx=allMs.indexOf(m);h+=`<button class="mo-o ${origIdx===cur?'cu':''}" onclick="pickM(${origIdx})">${m.n}${m.e?` <span class="en">${dots(m.e)}</span>`:""}${origIdx===cur?'<span class="ck"> ✓</span>':""}</button>`});$("mO").innerHTML=h;$("modal").classList.add("op")}
 function pickM(j){WP[S.w][swC.di][swC.tp]=j;save();$("modal").classList.remove("op");renderWeek()}
 $("mX").onclick=()=>$("modal").classList.remove("op");$("modal").onclick=e=>{if(e.target.id==="modal")$("modal").classList.remove("op")};
@@ -425,10 +465,71 @@ ${[
 <li>Zumos: si están pautados, que tengan ~12g CH cada 100ml</li>
 </ul></div>`}
 
+function printWeek(){
+const w=S.w,days=WP[w];
+const allIngredients=[];
+let menuHTML='',recipeHTML='';
+days.forEach((d,i)=>{
+const bf=BF[d.bf],lu=LU[d.lu],di=DI[d.di];
+menuHTML+=`<tr><td style="font-weight:700;padding:6px 10px;border:1px solid #ddd">${DL[i]}</td><td style="padding:6px 10px;border:1px solid #ddd">${dots(d.pila)}</td><td style="padding:6px 10px;border:1px solid #ddd">${bf.n}</td><td style="padding:6px 10px;border:1px solid #ddd">${lu.n}</td><td style="padding:6px 10px;border:1px solid #ddd">${di.n}</td></tr>`;
+[bf,lu,di].forEach(m=>{
+if(m.ig){m.ig.replace(/<br>/g,' · ').replace(/<[^>]+>/g,'').split(' · ').forEach(ing=>{const t=ing.trim();if(t&&t.length>1)allIngredients.push(t)})}
+});
+recipeHTML+=`<div style="page-break-inside:avoid;margin-bottom:16px;padding:12px;border:1px solid #ddd;border-radius:8px"><h3 style="margin:0 0 6px;font-size:14px;color:#333">${DL[i]} — ${dots(d.pila)}</h3>`;
+recipeHTML+=`<p style="margin:4px 0;font-size:12px"><b>Desayuno:</b> ${bf.n}</p><p style="font-size:11px;color:#666;margin:2px 0">${bf.ig||''}</p>`;
+recipeHTML+=`<p style="margin:8px 0 4px;font-size:12px"><b>Comida:</b> ${lu.n}</p><p style="font-size:11px;color:#666;margin:2px 0"><em>Ingredientes:</em> ${(lu.ig||'').replace(/<[^>]+>/g,'')}</p><p style="font-size:11px;color:#444;margin:2px 0"><em>Elaboración:</em> ${(lu.el||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()}</p>`;
+recipeHTML+=`<p style="margin:8px 0 4px;font-size:12px"><b>Cena:</b> ${di.n}</p><p style="font-size:11px;color:#666;margin:2px 0"><em>Ingredientes:</em> ${(di.ig||'').replace(/<[^>]+>/g,'')}</p><p style="font-size:11px;color:#444;margin:2px 0"><em>Elaboración:</em> ${(di.el||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()}</p>`;
+recipeHTML+=`</div>`;
+});
+const unique=new Map();
+allIngredients.forEach(ing=>{const clean=ing.replace(/^\d+[\s,.]*/,'').replace(/^[gG]\s+de\s+/,'').toLowerCase().trim();
+const key=clean.replace(/\d+/g,'').replace(/[gml]+\s*/,'').trim();
+if(!unique.has(key))unique.set(key,[]);unique.get(key).push(ing)});
+let shopHTML='';
+unique.forEach((items,key)=>{shopHTML+=`<li style="font-size:12px;padding:3px 0;border-bottom:1px solid #eee">${items[0]}${items.length>1?' <span style="color:#999">(×'+items.length+')</span>':''}</li>`});
+
+const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#FF9F0A">
+<title>Semana ${w} — Plan JM</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,Helvetica,Arial,sans-serif;padding:20px;color:#222;font-size:13px;max-width:900px;margin:0 auto}
+h1{font-size:20px;margin-bottom:4px}h2{font-size:16px;margin:20px 0 10px;padding-bottom:4px;border-bottom:2px solid #333}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px}th{background:#f5f5f5;padding:6px 10px;border:1px solid #ddd;text-align:left;font-size:11px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media print{body{padding:10px;font-size:11px}h1{font-size:16px}h2{font-size:14px}.no-print{display:none}.page-break{page-break-before:always}}
+@media(max-width:600px){.cols{grid-template-columns:1fr}}
+</style></head><body>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<div><h1>Plan Menú — Semana ${w}</h1><p style="color:#666">José María · Aumenta+ · ${APP_V} (${APP_DATE})</p></div>
+<button class="no-print" onclick="window.print()" style="padding:10px 20px;font-size:14px;background:#0A84FF;color:#fff;border:none;border-radius:8px;cursor:pointer">🖨️ Imprimir</button>
+</div>
+
+<h2>📅 Menú semanal</h2>
+<table><tr><th>Día</th><th>Pila</th><th>Desayuno</th><th>Comida</th><th>Cena</th></tr>${menuHTML}</table>
+<p style="font-size:11px;color:#666;margin-bottom:6px">+ 4 piezas de fruta al día como merienda</p>
+
+<h2>🛒 Lista de la compra</h2>
+<div class="cols"><div><ul style="list-style:none;padding:0">${shopHTML}</ul></div></div>
+
+<div class="page-break"></div>
+<h2>👨‍🍳 Recetas de la semana</h2>
+${recipeHTML}
+
+<p style="margin-top:20px;font-size:10px;color:#999;text-align:center">Plan de Menú y Suplementación — José María ${APP_V} (${APP_DATE}) · Aumenta+</p>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+</script>
+</body></html>`;
+
+const w2=window.open('','_blank');
+if(w2){w2.document.write(html);w2.document.close()}else{alert('Permite ventanas emergentes para imprimir')}
+}
+
 const VW=["week","menus","recetas","supps","equiv"];
 document.querySelectorAll(".tb").forEach(b=>{b.addEventListener("click",()=>{document.querySelectorAll(".tb").forEach(x=>x.classList.remove("on"));b.classList.add("on");S.v=b.dataset.v;VW.forEach(v=>{const el=$("v"+v.charAt(0).toUpperCase()+v.slice(1));if(el)el.classList.toggle("hidden",S.v!==v)});$("plannerW").classList.toggle("hidden",S.v!=="week");document.querySelector(".week-nav").style.display=(S.v==="week"||S.v==="supps")?"flex":"none";document.querySelector(".hdr-actions").style.display=S.v==="week"?"flex":"none";if(S.v==="menus")renderMenus();if(S.v==="recetas")renderRecetas();if(S.v==="supps"){renderSupps();updWlabel()}if(S.v==="equiv")renderEquiv()})});
 wSel.addEventListener("change",e=>{S.w=+e.target.value;save();updWlabel();renderPlanner();renderWeek();if(S.v==="supps")renderSupps()});
 rebuildWsel();
+$("appVer").textContent="José María · "+APP_V+" · "+APP_DATE;
 renderPlanner();renderWeek();
 </script>
 <script>
