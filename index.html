@@ -265,7 +265,7 @@ const PROTS_B=["3 huevos L","2 huevos L + 20g queso tierno","2 huevos L + 25g ja
 
 let S={v:"week",w:1,oDay:-1,totalW:12};
 const WP={};
-function newWeek(w){return DN.map((_,i)=>({pila:i<5?2:1,sp:i===0||i===2||i===4?"bici":i===1||i===3?"gym":"descanso",hr:2,bf:i%3,lu:i%9,di:(i+3)%9,rec:null,ck:{}}))}
+function newWeek(w){return DN.map((_,i)=>{const p=i<5?2:1;const fl=pilaFilter(LU,p);const fd=pilaFilter(DI,p);return{pila:p,sp:i===0||i===2||i===4?"bici":i===1||i===3?"gym":"descanso",hr:2,bf:i%3,lu:fl.length?LU.indexOf(fl[i%fl.length]):i%9,di:fd.length?DI.indexOf(fd[i%fd.length]):(i+3)%9,rec:null,ck:{}}})}
 function initWP(){for(let w=1;w<=S.totalW;w++)WP[w]=newWeek(w)}
 function save(){try{localStorage.setItem("aum_wp",JSON.stringify(WP));localStorage.setItem("aum_s",JSON.stringify({w:S.w,totalW:S.totalW}));const ind=document.getElementById("saveInd");if(ind){ind.style.opacity="1";clearTimeout(ind._t);ind._t=setTimeout(()=>ind.style.opacity="0",1200)}}catch(e){}}
 function load(){try{const wp=localStorage.getItem("aum_wp");const s=localStorage.getItem("aum_s");if(s){const sd=JSON.parse(s);S.w=sd.w||1;S.totalW=sd.totalW||12}if(wp){const d=JSON.parse(wp);for(let w in d){WP[w]=d[w];WP[w].forEach(day=>{if(!day.ck)day.ck={};if(!day.rec)day.rec=null})}S.totalW=Math.max(S.totalW,Object.keys(WP).length)}else{initWP()}return!!wp}catch(e){initWP();return false}}
@@ -286,9 +286,10 @@ function renderPlanner(){const d=WP[S.w];$("plannerW").innerHTML=`<div class="pl
 function setPila(i,v){WP[S.w][i].pila=v;autoM(i);save();renderPlanner();renderWeek()}
 function setSport(i,v){WP[S.w][i].sp=v;save();renderPlanner();renderWeek()}
 function setHr(i,v){WP[S.w][i].hr=v;save();renderPlanner();renderWeek()}
-function autoM(i){const d=WP[S.w][i],p=d.pila;const fl=LU.filter(m=>p>=3?m.e>=3:p===2?m.e>=2:true);const fd=DI.filter(m=>p>=3?m.e>=2:true);if(fl.length)d.lu=LU.indexOf(fl[i%fl.length]);if(fd.length)d.di=DI.indexOf(fd[i%fd.length])}
+function autoM(i){const d=WP[S.w][i],p=d.pila;const fl=pilaFilter(LU,p);const fd=pilaFilter(DI,p);if(fl.length)d.lu=LU.indexOf(fl[i%fl.length]);if(fd.length)d.di=DI.indexOf(fd[i%fd.length])}
+function validateMeals(){const days=WP[S.w];if(!days)return;let changed=false;days.forEach((d,i)=>{const validLU=pilaFilter(LU,d.pila);const validDI=pilaFilter(DI,d.pila);if(validLU.length&&!validLU.includes(LU[d.lu])){d.lu=LU.indexOf(validLU[i%validLU.length]);changed=true}if(validDI.length&&!validDI.includes(DI[d.di])){d.di=DI.indexOf(validDI[i%validDI.length]);changed=true}});if(changed)save()}
 
-function renderWeek(){const w=S.w,days=WP[w];let h="";days.forEach((d,i)=>{const op=S.oDay===i,dn=(w-1)*7+i+1,pC=d.pila<=1?"p1":d.pila===2?"p2":d.pila===3?"p3":"p4",sC=d.sp==="bici"?"bici":d.sp==="gym"?"gym":"desc",sL=d.sp==="bici"?"🚴 "+d.hr+"h":d.sp==="gym"?"🏋️":"😌";
+function renderWeek(){validateMeals();const w=S.w,days=WP[w];let h="";days.forEach((d,i)=>{const op=S.oDay===i,dn=(w-1)*7+i+1,pC=d.pila<=1?"p1":d.pila===2?"p2":d.pila===3?"p3":"p4",sC=d.sp==="bici"?"bici":d.sp==="gym"?"gym":"desc",sL=d.sp==="bici"?"🚴 "+d.hr+"h":d.sp==="gym"?"🏋️":"😌";
 h+=`<div class="dc glass"><div class="dc-h" onclick="togDay(${i})"><div class="dc-dy">${DL[i]} <span>Día ${dn}</span></div><div class="dc-bg"><span class="badge ${pC}">${dots(d.pila)}</span><span class="badge ${sC}">${sL}</span><span class="dc-arr ${op?'o':''}">›</span></div></div><div class="dc-b ${op?'o':''}">`;
 h+=`<div class="st">🍽️ Comidas · ${dots(d.pila)}</div>`;
 h+=mS("🍳","DESAYUNO",BF[d.bf].n,i,"bf");if(d.rec==="bf")h+=rP(BF[d.bf],i);
@@ -321,7 +322,8 @@ function togDay(i){S.oDay=S.oDay===i?-1:i;renderWeek()}
 function togRec(i,t){const d=WP[S.w][i];d.rec=d.rec===t?null:t;renderWeek()}
 
 let swC=null;
-function openSw(di,tp){swC={di,tp};const ms=tp==="bf"?BF:tp==="lu"?LU:DI;const cur=WP[S.w][di][tp];const lb=tp==="bf"?"desayuno":tp==="lu"?"comida":"cena";$("mT").textContent="Cambiar "+lb;let h="";ms.forEach((m,j)=>{h+=`<button class="mo-o ${j===cur?'cu':''}" onclick="pickM(${j})">${m.n}${m.e?` <span class="en">${dots(m.e)}</span>`:""}${j===cur?'<span class="ck"> ✓</span>':""}</button>`});$("mO").innerHTML=h;$("modal").classList.add("op")}
+function pilaFilter(meals,pila){return meals.filter(m=>!m.e||( pila<=1?m.e<=2 : pila===2?m.e<=2 : pila===3?m.e>=2 : m.e>=3 ))}
+function openSw(di,tp){swC={di,tp};const allMs=tp==="bf"?BF:tp==="lu"?LU:DI;const pila=WP[S.w][di].pila;const ms=tp==="bf"?allMs:pilaFilter(allMs,pila);const cur=WP[S.w][di][tp];const lb=tp==="bf"?"desayuno":tp==="lu"?"comida":"cena";$("mT").textContent="Cambiar "+lb+" "+dots(pila);let h="";if(!ms.length){h=`<div style="padding:20px;text-align:center;color:var(--t3)">No hay platos para esta pila. Ajusta la pila del día.</div>`}ms.forEach(m=>{const origIdx=allMs.indexOf(m);h+=`<button class="mo-o ${origIdx===cur?'cu':''}" onclick="pickM(${origIdx})">${m.n}${m.e?` <span class="en">${dots(m.e)}</span>`:""}${origIdx===cur?'<span class="ck"> ✓</span>':""}</button>`});$("mO").innerHTML=h;$("modal").classList.add("op")}
 function pickM(j){WP[S.w][swC.di][swC.tp]=j;save();$("modal").classList.remove("op");renderWeek()}
 $("mX").onclick=()=>$("modal").classList.remove("op");$("modal").onclick=e=>{if(e.target.id==="modal")$("modal").classList.remove("op")};
 
