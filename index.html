@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#FF9F0A">
+<title>Plan de Menú y Suplementación — JM v3</title>
+<style>
+:root{--glass:rgba(255,255,255,.06);--glass2:rgba(255,255,255,.04);--gbd:rgba(255,255,255,.1);--bg:#000;--t:rgba(255,255,255,.92);--t2:rgba(255,255,255,.65);--t3:rgba(255,255,255,.38);--bl:#0A84FF;--bll:#60a5fa;--blb:rgba(59,130,246,.12);--rd:#FF453A;--rdb:rgba(255,69,58,.1);--yw:#FF9F0A;--ywl:#fbbf24;--ywb:rgba(255,159,10,.1);--gn:#30D158;--gnb:rgba(48,209,88,.12);--pr:#BF5AF2;--in:#5E5CE6;--inb:rgba(94,92,230,.12);--or:#FF9F0A;--orb:rgba(249,115,22,.1);--tl:#64D2FF;--r:22px;--r2:16px;--r3:12px}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','Roboto',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;margin:0;overflow-x:hidden;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;font-size:16px;line-height:1.5}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 30% 20%,rgba(10,132,255,.07) 0%,transparent 50%),radial-gradient(circle at 70% 60%,rgba(48,209,88,.05) 0%,transparent 40%),radial-gradient(circle at 50% 80%,rgba(191,90,242,.04) 0%,transparent 40%);z-index:0;pointer-events:none}
+button,select{font-family:inherit;cursor:pointer;font-size:16px}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(40px) saturate(180%);backdrop-filter:blur(40px) saturate(180%);border:1px solid var(--gbd);border-radius:var(--r)}
+.glass2{background:var(--glass2);-webkit-backdrop-filter:blur(20px) saturate(150%);backdrop-filter:blur(20px) saturate(150%);border:1px solid rgba(255,255,255,.06);border-radius:var(--r2)}
+@supports not(backdrop-filter:blur(1px)){.glass,.glass2{background:rgba(28,28,30,.93)}}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:40;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 14px;background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%)}
+.hdr-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;max-width:640px;margin-left:auto;margin-right:auto;gap:10px}
+.hdr-t{font-size:15px;font-weight:700;line-height:1.3}
+.hdr-t span{background:linear-gradient(135deg,var(--or),#FFD60A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr-t small{display:block;font-size:11px;font-weight:400;color:var(--t3);-webkit-text-fill-color:var(--t3);background:none}
+.hdr-actions{display:flex;gap:6px}
+.hdr-abtn{padding:7px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);color:var(--t3);font-size:13px;font-weight:500;min-height:36px;white-space:nowrap}
+.hdr-abtn:active{background:rgba(255,255,255,.1)}
+.week-nav{display:flex;align-items:center;justify-content:center;gap:8px;max-width:640px;margin:0 auto}
+.wn-arrow{width:48px;height:48px;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);color:var(--t2);font-size:24px;display:flex;align-items:center;justify-content:center}
+.wn-arrow:active{background:rgba(255,255,255,.12)}
+.wn-arrow:disabled{opacity:.15}
+.wn-label{min-width:130px;text-align:center;font-size:20px;font-weight:700}
+.wn-label span{font-size:13px;color:var(--t3);font-weight:400;display:block;margin-top:2px}
+
+/* TAB BAR */
+.tbar{position:fixed;bottom:0;left:0;right:0;z-index:50;padding:0 10px calc(env(safe-area-inset-bottom,0px) + 6px);pointer-events:none}
+.tbar-inner{max-width:640px;margin:0 auto;display:flex;gap:3px;padding:6px 8px;border-radius:100px;background:rgba(18,18,20,.82);-webkit-backdrop-filter:blur(50px) saturate(200%);backdrop-filter:blur(50px) saturate(200%);border:1px solid rgba(255,255,255,.06);pointer-events:auto;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.tb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 2px 8px;border-radius:100px;border:none;background:transparent;color:var(--t3);font-size:11px;font-weight:500;min-height:48px;justify-content:center}
+.tb.on{background:rgba(255,255,255,.1);color:var(--t)}
+.tb-ic{font-size:28px;line-height:1;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;display:block}
+
+/* CONTENT */
+.ct{padding:10px 16px 95px;position:relative;z-index:1;max-width:640px;margin:0 auto}
+
+/* PLANNER */
+.planner{border-radius:var(--r);overflow:hidden;margin-bottom:18px}
+.pl-t{font-size:13px;font-weight:600;color:var(--t2);padding:16px 16px 8px;text-transform:uppercase;letter-spacing:.06em}
+.pl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 8px 12px}
+.pl-scroll::-webkit-scrollbar{display:none}
+.pl-grid{display:grid;grid-template-columns:52px repeat(7,72px);text-align:center;gap:4px 2px;min-width:max-content}
+.pl-hd{padding:4px 2px 6px;color:var(--t3);font-size:13px;font-weight:700}
+.pl-lb{text-align:right;padding:0 6px 0 0;color:var(--t2);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:flex-end;text-transform:uppercase;letter-spacing:.04em;height:40px}
+.pl-c{padding:1px}
+.pl-c select{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--t);font-size:13px;font-weight:600;padding:8px 0;border-radius:10px;text-align:center;text-align-last:center;-webkit-appearance:none;appearance:none;height:40px;line-height:1}
+.pl-c select option{background:#1c1c1e;text-align:center}
+.pl-c select.pila{color:var(--or);font-weight:800}.pl-c select.sport{color:var(--tl)}.pl-c select.dur{color:var(--gn)}
+.pl-note{padding:8px 16px 14px;font-size:12px;color:var(--t3)}
+
+/* DAY CARDS */
+.dc{border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.dc-h{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;cursor:pointer;min-height:60px}
+.dc-h:active{background:rgba(255,255,255,.03)}
+.dc-dy{font-weight:700;font-size:18px}.dc-dy span{color:var(--t3);font-weight:400;font-size:14px;margin-left:6px}
+.dc-bg{display:flex;gap:6px;align-items:center}
+.badge{font-size:14px;padding:6px 14px;border-radius:100px;font-weight:600;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',system-ui,sans-serif}
+.badge.p1{background:rgba(48,209,88,.12);color:var(--gn)}.badge.p2{background:var(--ywb);color:var(--yw)}.badge.p3{background:var(--orb);color:var(--or)}.badge.p4{background:var(--rdb);color:var(--rd)}
+.badge.bici{background:var(--blb);color:var(--bll)}.badge.gym{background:var(--rdb);color:var(--rd)}.badge.desc{background:var(--inb);color:var(--in)}
+.dc-arr{color:var(--t3);font-size:16px;transition:transform .25s;margin-left:4px}.dc-arr.o{transform:rotate(180deg)}
+.dc-b{display:none;padding:6px 20px 20px}.dc-b.o{display:block}
+
+/* SECTIONS */
+.st{font-size:14px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin:20px 0 12px;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',system-ui,sans-serif}
+
+/* MEAL SLOTS */
+.ms{border-radius:var(--r2);padding:16px 18px;margin-bottom:10px}
+.ms-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ms-lb{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);font-weight:600;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',system-ui,sans-serif}
+.ms-nm{font-size:16px;color:var(--t);margin-top:3px;font-weight:500}
+.ms-bt{display:flex;gap:6px}
+.mb{width:48px;height:48px;border-radius:16px;border:none;display:flex;align-items:center;justify-content:center;font-size:24px;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif}
+.mb.rc{background:rgba(48,209,88,.12);border:1px solid rgba(48,209,88,.15)}.mb.sw{background:rgba(10,132,255,.12);border:1px solid rgba(10,132,255,.15)}
+.mb:active{transform:scale(.92)}
+
+/* RECIPE PANEL */
+.rp{border-radius:var(--r2);padding:18px;margin:-4px 0 10px;border:1px solid rgba(48,209,88,.15);background:rgba(48,209,88,.04)}
+.rp h4{font-size:17px;margin-bottom:10px;color:var(--gn);font-weight:700}
+.rp-x{background:none;border:none;color:var(--t3);float:right;font-size:22px;padding:4px}
+.rp .ri{font-size:15px;color:var(--t2);line-height:1.8}.rp .ri b{color:var(--t)}
+.rp .rs{font-size:15px;color:var(--t3);margin-top:12px;line-height:1.7}.rp .rs b{color:var(--t2)}
+.rp .rs ol{padding-left:22px;margin-top:6px}.rp .rs li{margin-bottom:5px}
+.rp .rn{font-size:12px;color:var(--t3);margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)}
+
+/* PILA NOTE */
+.pila-note{font-size:14px;padding:14px 18px;border-radius:var(--r2);margin-bottom:10px}
+.pila-note.max{background:rgba(191,90,242,.08);color:var(--pr);border:1px solid rgba(191,90,242,.15)}
+
+/* PILLS */
+.pill{display:flex;align-items:flex-start;gap:10px;padding:10px 0}
+.pill+.pill{border-top:1px solid rgba(255,255,255,.04)}
+.pn{font-size:15px;font-weight:600}.pp{font-size:13px;color:var(--t3)}
+
+/* HYDRATION */
+.hy{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.hb{border-radius:var(--r3);padding:14px 16px}
+.hb-l{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.hb-v{font-size:15px;color:var(--t2);margin-top:4px}
+.hb-f{grid-column:1/-1}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.modal.op{display:flex}
+.mo-s{background:rgba(28,28,30,.95);-webkit-backdrop-filter:blur(40px) saturate(180%);backdrop-filter:blur(40px) saturate(180%);border-radius:var(--r) var(--r) 0 0;width:100%;max-width:640px;max-height:72vh;overflow-y:auto;padding:22px 18px calc(env(safe-area-inset-bottom,0px) + 26px)}
+.mo-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.mo-h h3{font-size:20px;font-weight:700}
+.mo-x{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:var(--t2);font-size:20px;display:flex;align-items:center;justify-content:center}
+.mo-o{display:block;width:100%;text-align:left;padding:16px 18px;margin-bottom:6px;border-radius:var(--r2);border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.04);color:var(--t);font-size:17px;font-weight:500;min-height:52px}
+.mo-o:active{background:rgba(255,255,255,.08)}
+.mo-o.cu{border:2px solid var(--bl);background:rgba(10,132,255,.08)}
+.mo-o .ck{color:var(--bl);font-size:12px;margin-left:8px}
+.mo-o .en{float:right;font-size:14px}
+
+/* MENUS & RECETAS */
+.mg{margin-bottom:24px}.mg h3{font-size:20px;font-weight:700;margin-bottom:14px}
+.mi{border-radius:var(--r2);padding:18px 20px;margin-bottom:8px;cursor:pointer}.mi:active{background:rgba(255,255,255,.04)}
+.mi-n{font-size:17px;font-weight:500}.mi-e{font-size:14px;float:right}
+.rc{border-radius:var(--r2);padding:20px;margin-bottom:12px}
+.rc h4{font-size:18px;font-weight:700;margin-bottom:6px}
+.rc .rt{font-size:12px;padding:5px 14px;border-radius:100px;font-weight:600;display:inline-block;margin-bottom:10px}
+.rc .rt.co{background:var(--ywb);color:var(--yw)}.rc .rt.ce{background:var(--inb);color:var(--in)}.rc .rt.de{background:var(--gnb);color:var(--gn)}.rc .rt.it{background:var(--rdb);color:var(--rd)}
+.rc .ri{font-size:15px;color:var(--t2);line-height:1.8}.rc .ri b{color:var(--t)}
+.rc .rs{font-size:15px;color:var(--t3);margin-top:10px;line-height:1.7}.rc .rs ol{padding-left:22px;margin-top:6px}.rc .rs li{margin-bottom:4px}
+
+/* SUPPS & EQUIV */
+.sc{border-radius:var(--r);padding:22px;margin-bottom:14px}
+.sc-l{font-size:15px;font-weight:700;margin-bottom:12px}
+.si{display:flex;gap:12px;padding:12px 0}.si+.si{border-top:1px solid rgba(255,255,255,.04)}
+.sid{width:10px;height:10px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.sin{font-size:17px;font-weight:600}.sid2{font-size:15px;color:var(--t2)}.siw{font-size:13px;color:var(--t3)}.sii{font-size:13px;color:var(--t3);margin-top:3px}
+.tw{display:flex;flex-wrap:wrap;gap:8px}
+.tg{border-radius:100px;padding:7px 16px;font-size:14px;font-weight:500}
+.tg.c{background:var(--ywb);border:1px solid rgba(255,159,10,.15);color:var(--ywl)}
+.tg.p{background:var(--rdb);border:1px solid rgba(255,69,58,.15);color:#f87171}
+.nl{font-size:15px;color:var(--t2);padding-left:20px;line-height:2}
+.hidden{display:none}
+
+/* DESKTOP */
+@media(min-width:640px){
+.hdr-t{font-size:18px}
+.dc-dy{font-size:20px}
+.ct{padding-left:28px;padding-right:28px}
+}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div id="saveInd" style="position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--gn);opacity:0;transition:opacity .3s;pointer-events:none;z-index:99">💾 Guardado</div>
+  <div class="hdr-row">
+    <div class="hdr-t">⚡ <span>Plan de Menú y Suplementación</span><small id="appVer">José María · v3</small></div>
+    <div class="hdr-actions">
+      <button class="hdr-abtn" onclick="printWeek()" style="background:rgba(10,132,255,.1);color:var(--bl)">🖨️ Imprimir</button>
+      <button class="hdr-abtn" onclick="addWeek()">+ Semana</button>
+      <button class="hdr-abtn" onclick="if(S.totalW>1&&confirm('¿Eliminar sem '+S.totalW+'?')){delete WP[S.totalW];S.totalW--;if(S.w>S.totalW)S.w=S.totalW;save();rebuildWsel();renderPlanner();renderWeek()}">− Sem</button>
+      <button class="hdr-abtn" onclick="if(confirm('¿Reset total?')){try{localStorage.removeItem('aum_wp');localStorage.removeItem('aum_s')}catch(e){}location.reload()}">Reset</button>
+    </div>
+  </div>
+  <div class="week-nav">
+    <button class="wn-arrow" id="wPrev" onclick="chgWeek(-1)">‹</button>
+    <div class="wn-label" id="wLabel">Semana 1<span>de 12</span></div>
+    <button class="wn-arrow" id="wNext" onclick="chgWeek(1)">›</button>
+  </div>
+  <select id="wSel" style="display:none"></select>
+</div>
+<div id="plannerW"></div>
+<div class="ct"><div id="vWeek"></div><div id="vMenus" class="hidden"></div><div id="vRecetas" class="hidden"></div><div id="vSupps" class="hidden"></div><div id="vEquiv" class="hidden"></div></div>
+<div class="tbar"><div class="tbar-inner" id="tabBar">
+  <button class="tb on" data-v="week"><span class="tb-ic">📅</span>Semana</button>
+  <button class="tb" data-v="menus"><span class="tb-ic">🍽️</span>Menús</button>
+  <button class="tb" data-v="recetas"><span class="tb-ic">👨‍🍳</span>Recetas</button>
+  <button class="tb" data-v="supps"><span class="tb-ic">💊</span>Suplem.</button>
+  <button class="tb" data-v="equiv"><span class="tb-ic">🔄</span>Equiv.</button>
+</div></div>
+<div class="modal" id="modal"><div class="mo-s"><div class="mo-h"><h3 id="mT"></h3><button class="mo-x" id="mX">✕</button></div><div id="mO"></div></div></div>
+<script>
+const APP_V="v4",APP_DATE="15/04/2026";
+const DN=["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"],DL=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+
+// ============ RECETAS COMPLETAS ============
+const BF=[
+{n:"Tostada jamón y AOVE",e:0,ig:"60g de pan · 10ml de AOVE · 60g de jamón · Tomate al gusto",el:"Tuesta el pan. Unta tomate rallado, añade jamón y un chorrito de AOVE."},
+{n:"Tostada queso tierno",e:0,ig:"60g de pan · 30g de queso tierno · 5ml de AOVE · Tomate",el:"Tuesta el pan. Coloca lonchas de queso tierno, tomate y AOVE."},
+{n:"Tostada con revuelto",e:0,ig:"60g de pan · 2 huevos L · Tomate",el:"Bate los huevos y cuájalos a fuego suave removiendo. Sirve sobre el pan tostado con tomate."}
+];
+const LU=[
+{n:"Pasta con ternera y champiñones",e:1,
+ig:"75g de pasta · 75g de ternera magra picada o a taquitos · 75g de tomate frito en AOVE · Una cebolla mediana · Champiñones y setas al gusto · Orégano",
+el:"<ol><li>Cuece la pasta según las instrucciones del fabricante.</li><li>Pica la cebolla y los champiñones.</li><li>Calienta la sartén y añade las verduras, cocina a fuego medio con la ternera y la tapa puesta.</li><li>Escurre la pasta y reserva.</li><li>Añade el tomate frito en la sartén y seguidamente la pasta.</li><li>Cocina un minuto removiendo para que se mezcle todo. Espolvorea orégano y ¡listo!</li></ol>"},
+{n:"Emperador con patata y verdura",e:1,
+ig:"250g de emperador · 300g de patatas · Verduras al gusto",
+el:"Hornea las patatas cortadas tipo panadera con las verduras. Cocina el emperador a la plancha o al horno."},
+{n:"Pollo con guarnición de espinacas, pasas y nueces",e:1,
+ig:"120g de pechuga de pollo · 25g de pasas · 25g de nueces · 10ml de AOVE · Dos manojos de espinacas · Un diente de ajo",
+el:"<ol><li>Calienta el AOVE y añade el ajo en láminas.</li><li>Añade el pollo en tiras, cocina a fuego bajo con tapa. Tuesta y reserva.</li><li>Añade espinacas y pasas, cocina hasta que reduzcan.</li><li>Pica las nueces con cuchillo.</li><li>Añade el pollo y las nueces, cocina a fuego bajo removiendo.</li></ol>"},
+{n:"Hervido de patata, guisantes y huevo rallado",e:2,
+ig:"300g de patata · 2 huevos L · 150g de guisantes · 5ml de AOVE · Una zanahoria mediana · Un manojo de judías verdes · Pimienta · Sal",
+el:"<ol><li>Hierve agua a fuego fuerte. Añade todos los ingredientes menos AOVE y huevos, baja a fuego medio.</li><li>Cuando estén cocidos, sácalos y reserva.</li><li>Cuece los huevos 8 minutos.</li><li>Corta verduras y patata al gusto en un plato con guisantes.</li><li>Ralla los huevos duros encima, añade AOVE, sal y pimienta. ¡Listo!</li></ol>"},
+{n:"Arroz con salmón y verduras",e:2,
+ig:"90g de arroz · 100g de salmón · Espárragos",
+el:"<ol><li>Cuece el arroz según indicaciones.</li><li>Corta el salmón limpio en trozos y dora en sartén (sin aceite).</li><li>Añade espárragos en trozos. Cocina 2 minutos.</li><li>Incorpora el arroz y remueve. ¡Listo!</li></ol>"},
+{n:"Noodles con ternera y salsa dulce de soja",e:2,
+ig:"75g de fideos de arroz · 175g de ternera magra · 50g de ketchup light · Salsa de soja · Puerro · Zanahoria · Espinacas",
+el:"<ol><li>Cuece los fideos de arroz según el envase.</li><li>En sartén añade ternera a tiras o picada con las verduras, fuego bajo con tapa.</li><li>Cuando esté cocinado añade los fideos y la salsa, remueve 2 min.</li></ol><b>Salsa:</b> En un bol mezcla 50g ketchup con chorrito de soja. Repite hasta textura algo gelatinosa."},
+{n:"Filete de ternera con guarnición de arroz y guisantes",e:2,
+ig:"150g de ternera magra · 75g de arroz · 150g de guisantes · 1 cebolla mediana · 1 zanahoria mediana · Pimienta · Salsa de soja",
+el:"<ol><li>Cuece el arroz según instrucciones.</li><li>Pica cebolla y zanahoria.</li><li>Cocina cebolla y zanahoria a fuego medio con tapa.</li><li>Añade guisantes, cocina 6 min a fuego medio.</li><li>Añade arroz, chorrito de soja y pimienta. Fuego bajo 2 min removiendo.</li><li>Cocina los filetes al gusto. ¡Listo!</li></ol><b>Tip:</b> Puedes marinar la ternera 12h en soja, pimienta, limón, ajo, jengibre y tomillo."},
+{n:"Arroz con pollo al curry",e:3,
+ig:"100g de pechuga de pollo · 100g de arroz basmati · 200ml de leche de soja · 10ml de AOVE · 15g de maicena · Una zanahoria · Media cebolla · 30g de tomate triturado · Un pimiento rojo · Curry en polvo · Pimienta",
+el:"<ol><li>Calienta AOVE y cocina verduras a fuego bajo 10 min.</li><li>Cuece 100g de arroz según fabricante.</li><li>Corta pechuga en cuadritos e incorpora a la sartén.</li><li>Prepara en un vaso: leche de soja, 3 cucharadas de curry y maicena. Mezcla bien sin grumos.</li><li>Cuando el pollo esté hecho añade tomate y pimienta. Remueve 3 min a fuego bajo.</li><li>Añade la mezcla de soja+curry+maicena y deja reducir hasta textura de crema.</li><li>Sirve junto con el arroz.</li></ol>"},
+{n:"Cuscús con gambas, guisantes y zanahoria",e:4,
+ig:"120g de cuscús · 200g de guisantes · 150g de gambas · 5ml de AOVE · Zanahoria",
+el:"<ol><li>Prepara el cuscús según instrucciones del paquete.</li><li>Pela y corta la zanahoria en cubos pequeños.</li><li>Cocina zanahoria y guisantes en sartén con agua hasta tiernos.</li><li>Agrega gambas y saltea a fuego medio hasta que cambien de color.</li><li>Añade el cuscús y remueve. Cocina 1 min más. ¡Listo!</li></ol>"}
+];
+const DI=[
+{n:"Ramen de pollo",e:1,
+ig:"60g de fideos ramen · 60g de pollo · 100g de huesos de vacuno · 1 huevo L · ¼ puerro · 1 zanahoria · 15g de alga kombu · 40g setas shiitake secas · Hojas de cilantro · 20ml de salsa de soja · Cebollino · Perejil",
+el:"<ol><li>Pon agua en olla rápida. Agrega pollo, huesos, alga kombu, shiitake, zanahoria, puerro, cilantro y soja. Cuece 30 min.</li><li>Cuela el caldo, desgrasa y pon a calentar. Cuando hierva añade fideos 2-4 min.</li><li>Cuece el huevo 3-4 min en agua aparte. Reserva.</li><li>Cuela caldo y fideos por separado.</li><li>Sirve en plato hondo: tiras de pollo, setas troceadas, fideos y huevo. Espolvorea cebollino, vierte caldo y decora con perejil.</li></ol>"},
+{n:"Crema de boniato con verduras y ternera",e:1,
+ig:"200g de boniato · Un trocito de calabaza · 1 zanahoria · 75g de ternera magra · 15g de AOVE",
+el:"<ol><li>Pela y corta zanahoria y calabaza, cocina en olla con AOVE caliente unos minutos.</li><li>Añade ternera en tacos, boniato pelado y cubiteado. Cubre de agua.</li><li>Sube fuego hasta hervir y cocina 15 min.</li><li>Saca ingredientes con cuchara y tritura. Si quieres más líquido añade agua de cocción.</li></ol>"},
+{n:"Fajitas de ternera y verduras",e:1,
+ig:"3 tortillas mexicanas de trigo · 100g de solomillo de ternera magro · Pimiento verde · Pimiento rojo · Cebolla · Pimienta",
+el:"<ol><li>Pica las verduras muy finas en picadora o a cuchillo.</li><li>Añade ternera a tiras en sartén caliente a fuego medio con tapa. Añade pimienta.</li><li>Quita tapa, sube a fuego fuerte y tuesta. Reserva.</li><li>Echa verduras a la sartén a fuego fuerte para tostar (no cocines demasiado, que queden crujientes).</li><li>Calienta tortillas en microondas o sartén. Monta con ternera y verduras. ¡Listo!</li></ol>"},
+{n:"Hamburguesa de pollo con queso",e:2,
+ig:"Pan de hamburguesa (55g) · 150g de carne de pollo picada magra · 50g de queso tierno · Lechuga · Tomate · Cebolla · Sal · Pimienta",
+el:"<ol><li>Calienta sartén. Forma dos hamburguesas con el pollo picado, sal y pimienta.</li><li>Cuando esté casi cocinada añade queso encima para fundir.</li><li>Tuesta el pan mientras.</li><li>Monta la hamburguesa. ¡Listo!</li></ol><b>Nota:</b> Sirve con ensalada vegetal o verduras asadas de acompañamiento."},
+{n:"Ensalada de alubias con atún y picatostes",e:2,
+ig:"200g de alubias blancas cocidas · 1 lata de atún al natural (60g) · 70g de aceitunas negras · 50g de pan · 10ml de AOVE · Una cebolla · Tomates cherry · Pimiento verde · Ensalada de brotes",
+el:"<ol><li>Escurre las alubias cocidas y reserva.</li><li>Corta las verduras, mezcla con atún, AOVE y especias. Remueve.</li><li>Pon en un bol la ensalada de brotes, añade alubias escurridas, luego verdura con atún.</li></ol>"},
+{n:"Merluza con patatas",e:2,
+ig:"200g de merluza · 400g de patata · Un diente de ajo · Medio calabacín · Una cebolla · Perejil · AOVE",
+el:"<ol><li>Precalienta horno a 220º.</li><li>Corta patatas tipo panadera en el fondo de la bandeja.</li><li>Cebolla en juliana encima de las patatas.</li><li>Calabacín en tiras por los laterales.</li><li>Merluza en el centro.</li><li>En un bol mezcla ajo picado, perejil picado y aceite. Pinta el pescado y la guarnición con esta mezcla.</li></ol>"},
+{n:"Poke de salmón y edamame con quinoa y verduras",e:2,
+ig:"120g de salmón · 100g de edamame · 50g de quinoa · 50g de remolacha cocida · Tomates cherry · Brotes · Salsa de soja · Pimienta · Eneldo · Limón · Salsa sriracha",
+el:"<ol><li>Marina salmón unas horas con soja, limón, eneldo, pimienta y sriracha al gusto.</li><li>Cocina quinoa según envase.</li><li>Pela edamame o descongela hasta tener solo las habas.</li><li>Corta remolacha en daditos y cherry en mitades.</li><li>Corta salmón marinado en daditos.</li><li>En bol: brotes, quinoa escurrida, y el resto de ingredientes como topping.</li><li>Añade soja y limón. ¡Listo!</li></ol>"},
+{n:"Ensalada de pasta con atún y aguacate",e:3,
+ig:"100g de pasta · 60g de atún (1 lata) · Un tomate · 70g de maíz (1 lata) · 62,5g de queso fresco de burgos (1 tarrina) · 50g de aguacate · 5ml de AOVE",
+el:"<ol><li>Pon la pasta a hervir.</li><li>Abre latas y escurre. Corta tomate en dados.</li><li>Lava la pasta cocida con agua fría, escurre y sirve en ensaldera.</li><li>Añade el resto de ingredientes, remueve y listo.</li></ol><b>Nota:</b> Puedes añadir hojas verdes o zanahoria."},
+{n:"Berenjena rellena de carne picada al horno",e:4,
+ig:"1 berenjena · ½ cebolla · ½ diente de ajo · ½ pimiento rojo · 75g de carne picada de cerdo · 75g de carne picada de ternera · 125g de tomate triturado · ½ cuch. tomillo seco · ½ cuch. romero seco · 20g de harina · 15g de AOVE · 250ml de leche entera · ½ cuch. nuez moscada · 25g de queso rallado · Sal y pimienta",
+el:"<ol><li>Corta berenjena a lo largo por la mitad. Haz cortes en rejilla sin llegar a la piel. Hornea con AOVE a 180ºC 20 min.</li><li>Retira pulpa con cuchara manteniendo cáscara intacta.</li><li>En sartén con AOVE a fuego suave: ajo, cebolla y pimiento picados. Salpimienta 15 min.</li><li>Añade pulpa de berenjena picada y las carnes picadas. Desmenuza 2-3 min.</li><li>Añade tomate, tomillo y romero. Fuego suave 30 min hasta que evapore.</li><li><b>Bechamel:</b> Calienta AOVE, añade harina, tuesta 3 min. Ve añadiendo leche de 50 en 50ml integrando cada vez. Añade nuez moscada.</li><li>Rellena las cáscaras. Riega con bechamel. Espolvorea queso. Horno 200ºC 10 min hasta gratinar.</li></ol>"}
+];
+const INTRA=[
+{n:"Rollitos pan bimbo (5 variantes)",e:0,
+ig:"<b>≈30g CH cada uno.</b> Aplana pan blanco sin corteza con rodillo.<br><b>1. Mermelada:</b> 1 rebanada + 10g mermelada + 13g maltodextrina<br><b>2. Queso+canela:</b> 1 rebanada + queso untar light + 18g maltodextrina con canela<br><b>3. Queso+pavo:</b> 2 rebanadas + queso untar light + 1 loncha pavo<br><b>4. Vegan salado:</b> 2 rebanadas + tofu untar + sal tomate seco + orégano<br><b>5. Vegan dulce:</b> 1 rebanada + tofu untar + 18g maltodextrina con canela",
+el:"Aplana el pan con rodillo o botella. Añade el topping elegido. Enrolla. ¡Listo! Ideal para llevar en el maillot."},
+{n:"Pan de leche (4 variantes)",e:0,
+ig:"<b>≈30g CH cada uno.</b> Pan de leche (40g aprox.) con:<br><b>1.</b> + 20g de mermelada<br><b>2.</b> + 15g de miel<br><b>3.</b> + 20g de membrillo<br><b>4.</b> + queso philadelphia light + 15g maltodextrina",
+el:"Abre el pan de leche y rellena con la opción elegida. Fácil digestión durante la actividad."}
+];
+const HY=[{d:"≤1h",p:"Hipo 500ml",u:"1× iso 750ml",r:0},{d:"1–2h",p:"Hipo 500ml",u:"2× iso 750ml",r:0},{d:"2–3h",p:"Hipo 500ml",u:"2× iso 750ml",r:0},{d:"3–4h",p:"Hipo 500ml",u:"2–4× iso 750ml",r:1},{d:"4–5h",p:"Hipo 500ml",u:"4× iso 750ml",r:1},{d:"5–6h",p:"Hipo 500ml",u:"6× iso 750ml",r:1}];
+const CARBS=["100g arroz","100g pasta","100g cuscús","500g patata","400g boniato","100g quinoa","190g avena cocida","300g yuca","100g maíz hervido","100g amaranto cocido","125g pan blanco","3 tortillas fajita (36g c/u)","100g pan de pita","4 barquitas burrito (24g c/u)","100g picos de pan"];
+const PROTS_A=["100g carne blanca magra","100g carne roja magra","150g pescado blanco","100g pescado azul (salmón)","200g tofu","160g seitán","60g soja texturizada","400g clara de huevo","250g sepia o similar","230g pulpo o similar","230g mejillones, langostinos…"];
+const PROTS_B=["3 huevos L","2 huevos L + 20g queso tierno","2 huevos L + 25g jamón serrano","1 huevo L + 100g lomo embuchado","1 huevo L + 100g mojama","2 huevos L + 1 lata atún natural","100g carne roja procesada (hamburguesa)","300g huevas de bacalao","250g hígado de cerdo"];
+
+let S={v:"week",w:1,oDay:-1,totalW:12};
+const WP={};
+function newWeek(w){const days=[];const usedLU=new Set(),usedDI=new Set();
+for(let i=0;i<7;i++){const p=i<5?2:1;
+const fl=pilaFilter(LU,p),fd=pilaFilter(DI,p);
+let lu=0,di=0,picked=false;
+for(const m of fl){const idx=LU.indexOf(m);if(!usedLU.has(idx)){lu=idx;picked=true;break}}
+if(!picked&&fl.length)lu=LU.indexOf(fl[((w*7+i)*13)%fl.length]);
+usedLU.add(lu);picked=false;
+for(const m of fd){const idx=DI.indexOf(m);if(!usedDI.has(idx)){di=idx;picked=true;break}}
+if(!picked&&fd.length)di=DI.indexOf(fd[((w*7+i)*17)%fd.length]);
+usedDI.add(di);
+days.push({pila:p,sp:i===0||i===2||i===4?"bici":i===1||i===3?"gym":"descanso",hr:2,bf:i%3,lu,di,rec:null,ck:{}});}
+return days;}
+function initWP(){for(let w=1;w<=S.totalW;w++)WP[w]=newWeek(w)}
+function save(){try{localStorage.setItem("aum_wp",JSON.stringify(WP));localStorage.setItem("aum_s",JSON.stringify({w:S.w,totalW:S.totalW}));const ind=document.getElementById("saveInd");if(ind){ind.style.opacity="1";clearTimeout(ind._t);ind._t=setTimeout(()=>ind.style.opacity="0",1200)}}catch(e){}}
+function load(){try{const wp=localStorage.getItem("aum_wp");const s=localStorage.getItem("aum_s");if(s){const sd=JSON.parse(s);S.w=sd.w||1;S.totalW=sd.totalW||12}if(wp){const d=JSON.parse(wp);for(let w in d){WP[w]=d[w];WP[w].forEach(day=>{if(!day.ck)day.ck={};if(!day.rec)day.rec=null})}S.totalW=Math.max(S.totalW,Object.keys(WP).length)}else{initWP()}return!!wp}catch(e){initWP();return false}}
+function rebuildWsel(){const ws=$("wSel");ws.innerHTML="";for(let i=1;i<=S.totalW;i++){const o=document.createElement("option");o.value=i;o.textContent="Sem "+i;ws.appendChild(o)}ws.value=S.w;updWlabel()}
+function updWlabel(){const lb=$("wLabel");if(lb)lb.innerHTML=`Semana ${S.w}<span>de ${S.totalW}</span>`;const prev=$("wPrev");const next=$("wNext");if(prev)prev.disabled=S.w<=1;if(next)next.disabled=S.w>=S.totalW}
+function chgWeek(d){const nw=S.w+d;if(nw>=1&&nw<=S.totalW){S.w=nw;save();updWlabel();renderPlanner();renderWeek();if(S.v==="supps")renderSupps()}}
+function addWeek(){S.totalW++;WP[S.totalW]=newWeek(S.totalW);S.w=S.totalW;save();rebuildWsel();renderPlanner();renderWeek()}
+function delLastWeek(){if(S.totalW<=1)return;if(!confirm("¿Eliminar semana "+S.totalW+"?"))return;delete WP[S.totalW];S.totalW--;if(S.w>S.totalW)S.w=S.totalW;save();rebuildWsel();renderPlanner();renderWeek()}
+const loaded=load();
+if(!loaded)initWP();
+const $=id=>document.getElementById(id);
+const dots=n=>"🔋".repeat(n||0);
+rebuildWsel();
+function betaD(w){return w<=4?"6,4g":"1,2g"}
+function bicarb(w){return w<=1?"3g":w<=2?"4,5g":w<=3?"6g":"7,5g"}
+
+function renderPlanner(){const d=WP[S.w];$("plannerW").innerHTML=`<div class="planner glass" style="margin:10px 16px"><div class="pl-t">⚙️ Configurar semana ${S.w}</div><div class="pl-scroll"><div class="pl-grid"><div class="pl-hd"></div>${DN.map(n=>`<div class="pl-hd">${n}</div>`).join("")}<div class="pl-lb">🔋 Pila</div>${d.map((_,i)=>`<div class="pl-c"><select class="pila" onchange="setPila(${i},+this.value)">${[1,2,3,4].map(v=>`<option value="${v}" ${d[i].pila===v?"selected":""}>${dots(v)}</option>`).join("")}</select></div>`).join("")}<div class="pl-lb">🏅 Deporte</div>${d.map((_,i)=>`<div class="pl-c"><select class="sport" onchange="setSport(${i},this.value)"><option value="bici" ${d[i].sp==="bici"?"selected":""}>Bici</option><option value="gym" ${d[i].sp==="gym"?"selected":""}>Gym</option><option value="descanso" ${d[i].sp==="descanso"?"selected":""}>Desc</option></select></div>`).join("")}<div class="pl-lb">⏱ Horas</div>${d.map((_,i)=>`<div class="pl-c">${d[i].sp==="bici"?`<select class="dur" onchange="setHr(${i},+this.value)">${[1,2,3,4,5,6].map(v=>`<option value="${v}" ${d[i].hr===v?"selected":""}>${v}h</option>`).join("")}</select>`:`<select class="dur" disabled style="opacity:.25"><option>—</option></select>`}</div>`).join("")}</div></div><div class="pl-note">🔋 Pila → menú · 🏅 Deporte → suplementos + hidratación</div></div>`}
+function setPila(i,v){WP[S.w][i].pila=v;autoM(i);save();renderPlanner();renderWeek()}
+function setSport(i,v){WP[S.w][i].sp=v;save();renderPlanner();renderWeek()}
+function setHr(i,v){WP[S.w][i].hr=v;save();renderPlanner();renderWeek()}
+function autoM(i){
+const d=WP[S.w][i],p=d.pila;
+const fl=pilaFilter(LU,p),fd=pilaFilter(DI,p);
+const usedLU=new Set(),usedDI=new Set();
+WP[S.w].forEach((day,j)=>{if(j!==i){usedLU.add(day.lu);usedDI.add(day.di)}});
+let picked=false;
+for(const m of fl){const idx=LU.indexOf(m);if(!usedLU.has(idx)){d.lu=idx;picked=true;break}}
+if(!picked&&fl.length)d.lu=LU.indexOf(fl[((S.w*7+i)*13)%fl.length]);
+picked=false;
+for(const m of fd){const idx=DI.indexOf(m);if(!usedDI.has(idx)){d.di=idx;picked=true;break}}
+if(!picked&&fd.length)d.di=DI.indexOf(fd[((S.w*7+i)*17)%fd.length]);
+}
+function validateMeals(){const days=WP[S.w];if(!days)return;let changed=false;
+days.forEach((d,i)=>{
+const vLU=pilaFilter(LU,d.pila),vDI=pilaFilter(DI,d.pila);
+if(vLU.length&&!vLU.includes(LU[d.lu])){
+const used=new Set();days.forEach((dy,j)=>{if(j!==i)used.add(dy.lu)});
+let picked=false;for(const m of vLU){const idx=LU.indexOf(m);if(!used.has(idx)){d.lu=idx;picked=true;break}}
+if(!picked)d.lu=LU.indexOf(vLU[((S.w*7+i)*13)%vLU.length]);changed=true}
+if(vDI.length&&!vDI.includes(DI[d.di])){
+const used=new Set();days.forEach((dy,j)=>{if(j!==i)used.add(dy.di)});
+let picked=false;for(const m of vDI){const idx=DI.indexOf(m);if(!used.has(idx)){d.di=idx;picked=true;break}}
+if(!picked)d.di=DI.indexOf(vDI[((S.w*7+i)*17)%vDI.length]);changed=true}
+});if(changed)save()}
+
+function renderWeek(){validateMeals();const w=S.w,days=WP[w];let h="";days.forEach((d,i)=>{const op=S.oDay===i,dn=(w-1)*7+i+1,pC=d.pila<=1?"p1":d.pila===2?"p2":d.pila===3?"p3":"p4",sC=d.sp==="bici"?"bici":d.sp==="gym"?"gym":"desc",sL=d.sp==="bici"?"🚴 "+d.hr+"h":d.sp==="gym"?"🏋️":"😌";
+h+=`<div class="dc glass"><div class="dc-h" onclick="togDay(${i})"><div class="dc-dy">${DL[i]} <span>Día ${dn}</span></div><div class="dc-bg"><span class="badge ${pC}">${dots(d.pila)}</span><span class="badge ${sC}">${sL}</span><span class="dc-arr ${op?'o':''}">›</span></div></div><div class="dc-b ${op?'o':''}">`;
+h+=`<div class="st">🍽️ Comidas · ${dots(d.pila)}</div>`;
+h+=mS("🍳","DESAYUNO",BF[d.bf].n,i,"bf");if(d.rec==="bf")h+=rP(BF[d.bf],i);
+h+=mS("🥘","COMIDA",LU[d.lu].n,i,"lu");if(d.rec==="lu")h+=rP(LU[d.lu],i);
+h+=mS("🍽️","CENA",DI[d.di].n,i,"di");if(d.rec==="di")h+=rP(DI[d.di],i);
+h+=`<div class="ms glass2"><div class="ms-lb">🍎 MERIENDA</div><div class="ms-nm">4 piezas de fruta</div></div>`;
+if(d.pila>=4)h+=`<div class="pila-note max">⚡ Pila máxima — puedes añadir pan extra o postre</div>`;
+h+=`<div class="st">💊 Suplementos</div><div style="padding:0 2px">`;
+h+=pill("var(--rd)","Creatina 7g","Desayuno",i,"crea");h+=pill("var(--yw)",`β-alanina ${betaD(w)}`,w<=4?`Carga sem ${w}/4`:"Mant.",i,"beta");
+if(d.sp!=="descanso"){h+=pill("var(--rd)","Cafeína 200mg","45min pre",i,"cafe");h+=pill("var(--pr)","Sinefrina 60mg","45min pre",i,"sine");}
+if(d.sp==="bici")h+=pill("var(--gn)","Nitratos 500-600mg","2-3h pre",i,"nitr");
+if(d.sp==="gym")h+=pill("var(--bl)",`Bicarbonato ${bicarb(w)}`,`Sem ${w} pre-series`,i,"bica");
+h+=pill("var(--in)","Melatonina+Mg 2caps","30-45min antes dormir",i,"mela");h+=`</div>`;
+if(d.sp==="bici"){const hy=HY[Math.min(d.hr-1,5)],nIso=d.hr<=1?1:d.hr<=3?2:d.hr<=4?3:d.hr<=5?4:6;
+h+=`<div class="st">💧 Hidratación bici ${d.hr}h</div>
+<div class="hy">
+<div class="hb glass2"><div class="hb-l" style="color:var(--bl)">PRE-ENTRENO</div><div class="hb-v">1× bidón hipotónico 500ml</div><div style="font-size:10px;color:var(--t3);margin-top:4px">📋 25g maltodextrina + 1g sal</div></div>
+<div class="hb glass2"><div class="hb-l" style="color:var(--gn)">DURANTE</div><div class="hb-v">${nIso}× bidón isotónico 750ml</div><div style="font-size:10px;color:var(--t3);margin-top:4px">📋 Cada uno: 40g malto + 20g fructosa + 1g sal</div></div>
+${hy.r?`<div class="hb hb-f glass2"><div class="hb-l" style="color:var(--yw)">RECOVERY</div><div class="hb-v">Batido recuperación post-entreno</div></div>`:""}
+</div>
+<div style="font-size:11px;color:var(--t3);margin-top:6px;padding:8px 10px;background:rgba(255,255,255,.02);border-radius:10px">🛒 <b>Preparar:</b> 1 hipotónico (25g malto + 1g sal en 500ml) + ${nIso} isotónicos (${nIso*40}g malto + ${nIso*20}g fructosa + ${nIso}g sal total)</div>`}
+if(d.sp==="descanso")h+=`<div style="font-size:13px;color:var(--t3);margin-top:10px">😌 Sin suplementos pre-entreno</div>`;
+h+=`</div></div>`;});$("vWeek").innerHTML=h}
+
+function mS(ic,lb,nm,di,tp){return`<div class="ms glass2"><div class="ms-top"><div><div class="ms-lb">${ic} ${lb}</div><div class="ms-nm">${nm}</div></div><div class="ms-bt"><button class="mb rc" onclick="togRec(${di},'${tp}')">📖</button><button class="mb sw" onclick="openSw(${di},'${tp}')">↻</button></div></div></div>`}
+function rP(m,di){return`<div class="rp"><button class="rp-x" onclick="togRec(${di},null)">✕</button><h4>📖 ${m.n}</h4><div class="ri"><b>Ingredientes:</b><br>${m.ig}</div><div class="rs"><b>Elaboración:</b>${m.el}</div>${m.rn?`<div class="rn">${m.rn}</div>`:""}</div>`}
+function pill(c,n,p,di,k){const ck=WP[S.w][di].ck[k]||false;return`<div class="pill" style="${ck?'opacity:.5':''}"><button onclick="togCk(${di},'${k}')" style="width:24px;height:24px;border-radius:8px;border:2px solid ${ck?'var(--gn)':c};background:${ck?'var(--gn)':'transparent'};color:#fff;font-size:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center">${ck?'✓':''}</button><div style="flex:1"><div class="pn" ${ck?'style="text-decoration:line-through"':''}>${n}</div><div class="pp">${p}</div></div></div>`}
+function togCk(di,k){WP[S.w][di].ck[k]=!WP[S.w][di].ck[k];save();renderWeek()}
+function togDay(i){S.oDay=S.oDay===i?-1:i;renderWeek()}
+function togRec(i,t){const d=WP[S.w][i];d.rec=d.rec===t?null:t;renderWeek()}
+
+let swC=null;
+function pilaFilter(meals,pila){
+const f=meals.filter(m=>!m.e||m.e===pila);
+return f.length?f:meals;
+}
+function openSw(di,tp){swC={di,tp};const allMs=tp==="bf"?BF:tp==="lu"?LU:DI;const pila=WP[S.w][di].pila;const ms=tp==="bf"?allMs:pilaFilter(allMs,pila);const cur=WP[S.w][di][tp];const lb=tp==="bf"?"desayuno":tp==="lu"?"comida":"cena";$("mT").textContent="Cambiar "+lb+" "+dots(pila);let h="";if(!ms.length){h=`<div style="padding:20px;text-align:center;color:var(--t3)">No hay platos para esta pila. Ajusta la pila del día.</div>`}ms.forEach(m=>{const origIdx=allMs.indexOf(m);h+=`<button class="mo-o ${origIdx===cur?'cu':''}" onclick="pickM(${origIdx})">${m.n}${m.e?` <span class="en">${dots(m.e)}</span>`:""}${origIdx===cur?'<span class="ck"> ✓</span>':""}</button>`});$("mO").innerHTML=h;$("modal").classList.add("op")}
+function pickM(j){WP[S.w][swC.di][swC.tp]=j;save();$("modal").classList.remove("op");renderWeek()}
+$("mX").onclick=()=>$("modal").classList.remove("op");$("modal").onclick=e=>{if(e.target.id==="modal")$("modal").classList.remove("op")};
+
+let menuOpen={t:null,i:-1};
+function togMenu(t,i){if(menuOpen.t===t&&menuOpen.i===i){menuOpen={t:null,i:-1}}else{menuOpen={t,i}}renderMenus()}
+function menuCard(m,type,idx){const isOpen=menuOpen.t===type&&menuOpen.i===idx;
+return`<div class="mi glass" onclick="togMenu('${type}',${idx})" style="cursor:pointer"><div style="display:flex;justify-content:space-between;align-items:center"><span class="mi-n">${m.n||m.f||''}</span><span style="display:flex;align-items:center;gap:6px">${m.e?`<span class="mi-e">${dots(m.e)}</span>`:''}<span style="color:var(--t3);font-size:14px">${isOpen?'▾':'›'}</span></span></div>${isOpen?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06)"><div style="font-size:14px;color:var(--t2);line-height:1.8"><b style="color:var(--t)">Ingredientes:</b><br>${(m.ig||'').replace(/<br>/g,'<br>')}</div><div style="font-size:14px;color:var(--t3);margin-top:10px;line-height:1.7"><b style="color:var(--t2)">Elaboración:</b>${m.el||''}</div></div>`:''}</div>`}
+function renderMenus(){$("vMenus").innerHTML=`<div class="mg"><h3>🍳 Desayunos</h3>${BF.map((m,i)=>menuCard(m,'bf',i)).join("")}</div><div class="mg"><h3>🥘 Comidas</h3>${LU.map((m,i)=>menuCard(m,'lu',i)).join("")}</div><div class="mg"><h3>🍽️ Cenas</h3>${DI.map((m,i)=>menuCard(m,'di',i)).join("")}</div><div class="mg"><h3>🚴 Intraentreno</h3>${INTRA.map((m,i)=>menuCard(m,'it',i)).join("")}</div><div class="mg"><h3>🍎 Merienda</h3><div class="mi glass">4 piezas de fruta (o 3 + 2 yogures desnatados)</div></div>`}
+
+function renderRecetas(){const all=[...BF.map(m=>({...m,tp:"de"})),...LU.map(m=>({...m,tp:"co"})),...DI.map(m=>({...m,tp:"ce"})),...INTRA.map(m=>({...m,tp:"it"}))];$("vRecetas").innerHTML=all.map(r=>`<div class="rc glass"><span class="rt ${r.tp}">${r.tp==="de"?"DESAYUNO":r.tp==="co"?"COMIDA":r.tp==="ce"?"CENA":"INTRA"}</span><h4>${r.n}</h4><div class="ri"><b>Ingredientes:</b><br>${r.ig}</div><div class="rs"><b>Elaboración:</b>${r.el}</div></div>`).join("")}
+
+function renderSupps(){const w=S.w;$("vSupps").innerHTML=`<h3 style="font-size:20px;font-weight:700;margin-bottom:16px">💊 Suplementación</h3>
+
+<div class="sc glass"><div class="sc-l" style="color:var(--gn)">Diario (todos los días)</div>
+<div class="si"><div class="sid" style="background:var(--rd)"></div><div><div class="sin">Creatina</div><div class="sid2">7g polvo · Sello Creapure</div><div class="siw">⏰ Con el desayuno o en batido de proteína</div><div class="sii">Principal sustrato energético en esfuerzos máximos de corta duración. Aumenta potencia en subidas, sprints y fuerza máxima en primeras repeticiones.</div></div></div>
+<div class="si"><div class="sid" style="background:var(--yw)"></div><div><div class="sin">β-alanina</div><div class="sid2">${betaD(w)}${w<=4?` (carga — semana ${w} de 4)`:' (mantenimiento)'} · Formato: cápsulas o polvo</div><div class="siw">⏰ Cuando quieras · Funciona por acumulación</div><div class="sii">Retrasa sensación de fatiga actuando como tampón del pH muscular. 6,4g/día las primeras 4 semanas, luego 1,2g/día.</div><div class="sii" style="color:var(--yw)">⚠️ Posible parestesia (picor). Si molesta mucho, divide la dosis en 2+ tomas al día.</div></div></div>
+<div class="si"><div class="sid" style="background:var(--in)"></div><div><div class="sin">Melatonina + Magnesio</div><div class="sid2">2 cápsulas</div><div class="siw">⏰ 30-45 minutos antes de dormir</div><div class="sii">Mejora conciliación y calidad del sueño. Evita el uso de pantallas después de tomarlo.</div></div></div>
+</div>
+
+<div class="sc glass"><div class="sc-l" style="color:var(--rd)">Pre-Entreno (solo días con deporte)</div>
+<div class="si"><div class="sid" style="background:var(--rd)"></div><div><div class="sin">Cafeína <span style="font-size:10px;color:var(--t3)">(Rendimiento + Peso)</span></div><div class="sid2">200mg · Formato: cápsulas</div><div class="siw">⏰ 45 minutos antes de empezar · Solo cuando actividad ≤2h</div><div class="sii">Reduce la percepción de esfuerzo. Si la actividad dura más de 2 horas, ajustar la ingesta por WhatsApp con el coach.</div><div class="sii" style="color:var(--yw)">⚠️ Descansa de cafeína en semanas de descarga. También de cafés con cafeína — puedes tomarlos descafeinados.</div></div></div>
+<div class="si"><div class="sid" style="background:var(--pr)"></div><div><div class="sin">Sinefrina <span style="font-size:10px;color:var(--t3)">(Pérdida de peso)</span></div><div class="sid2">60mg · Formato: cápsulas</div><div class="siw">⏰ 45 minutos antes de la actividad</div><div class="sii">Ayuda en la pérdida de grasa aumentando el uso de grasas como sustrato energético. Beneficioso en dietas con déficit.</div></div></div>
+<div class="si"><div class="sid" style="background:var(--gn)"></div><div><div class="sin">Nitratos <span style="font-size:10px;color:var(--t3)">(Rendimiento · solo bici)</span></div><div class="sid2">500-600mg · Formato: polvo</div><div class="siw">⏰ 2-3 horas antes de la actividad</div><div class="sii">Mejoran el uso del oxígeno por parte del organismo, siendo más eficiente en el uso de sustratos energéticos.</div></div></div>
+<div class="si"><div class="sid" style="background:var(--bl)"></div><div><div class="sin">Bicarbonato <span style="font-size:10px;color:var(--t3)">(Rendimiento · series/intervalos)</span></div><div class="sid2">${bicarb(w)} (semana ${w}) · Se compra en supermercado</div><div class="siw">⏰ Entre 1 y 6 horas antes del entreno · Solo días de series o esfuerzos interválicos</div><div class="sii">Funciona como la β-alanina pero de forma aguda (efecto el día que lo tomas). Progresión: Sem 1→3g · Sem 2→4,5g · Sem 3→6g · Sem 4→7,5g</div><div class="sii" style="color:var(--yw)">⚠️ Puede sentar mal (problemas intestinales). Introducir poco a poco. Si alguna cantidad da problemas, mantén la de la semana anterior. Puedes mezclarlo en botella con agua y saborizante e ir bebiendo durante la mañana.</div></div></div>
+</div>
+
+<div class="sc glass"><div class="sc-l" style="color:var(--bl)">🚴 Hidratación Bici</div>
+<div class="sii" style="margin-bottom:10px">El bidón hipotónico puedes tomarlo entre 60 minutos y justo antes de empezar la actividad física.</div>
+<table style="width:100%;font-size:13px;border-collapse:collapse">
+<tr style="color:var(--t3)"><th style="text-align:left;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.06)">Duración</th><th style="text-align:left;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.06)">PRE</th><th style="text-align:left;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.06)">DURANTE</th><th style="text-align:left;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.06)">RECOVERY</th></tr>
+${HY.map(h=>`<tr><td style="padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.03)">${h.d}</td><td style="padding:6px 4px;color:var(--t2);border-bottom:1px solid rgba(255,255,255,.03)">${h.p}</td><td style="padding:6px 4px;color:var(--t2);border-bottom:1px solid rgba(255,255,255,.03)">${h.u}</td><td style="padding:6px 4px;color:var(--t2);border-bottom:1px solid rgba(255,255,255,.03)">${h.r?"Batido recovery":"—"}</td></tr>`).join("")}
+</table></div>
+
+<div class="sc glass"><div class="sc-l" style="color:var(--tl)">🥤 Preparación de bidones</div>
+<div class="sii" style="margin-bottom:12px">Así preparas el bidón para que quede isotónico. No necesitas llevar agua sola. Si consumes menos de 60g CH/h puedes usar solo maltodextrina (sin fructosa).</div>
+
+<div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:6px">Bidón hipotónico (PRE-entreno)</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
+<div style="background:rgba(100,210,255,.06);border:1px solid rgba(100,210,255,.1);border-radius:12px;padding:12px">
+<div style="font-size:11px;font-weight:700;color:var(--tl)">250 ml</div>
+<div style="font-size:13px;color:var(--t2);margin-top:4px">12g maltodextrina<br>1g sal de mesa</div>
+</div>
+<div style="background:rgba(100,210,255,.06);border:1px solid rgba(100,210,255,.1);border-radius:12px;padding:12px">
+<div style="font-size:11px;font-weight:700;color:var(--tl)">500 ml</div>
+<div style="font-size:13px;color:var(--t2);margin-top:4px">25g maltodextrina<br>1g sal de mesa</div>
+</div>
+</div>
+
+<div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:6px">Bidón isotónico (DURANTE entreno)</div>
+<div style="background:rgba(48,209,88,.06);border:1px solid rgba(48,209,88,.1);border-radius:12px;padding:12px">
+<div style="font-size:11px;font-weight:700;color:var(--gn)">750 ml</div>
+<div style="font-size:13px;color:var(--t2);margin-top:4px">40g maltodextrina + 20g fructosa + 1g sal de mesa</div>
+</div>
+</div>`}
+
+function renderEquiv(){$("vEquiv").innerHTML=`<h3 style="font-size:20px;font-weight:700;margin-bottom:5px">🔄 Equivalencias</h3><p style="font-size:13px;color:var(--t3);margin-bottom:16px">Todos los alimentos de cada grupo son intercambiables entre sí. Pesos en crudo salvo legumbres (cocidas).</p>
+
+<div class="sc glass"><div class="sc-l" style="color:var(--yw)">🌾 Hidratos de carbono</div>
+<p style="font-size:11px;color:var(--t3);margin-bottom:8px">Puedes sustituir cualquiera por otro de esta lista. Ej: 100g arroz = 500g patata</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+${CARBS.map(c=>`<div style="font-size:13px;color:var(--t2);padding:8px 10px;background:rgba(255,159,10,.05);border-radius:10px;border:1px solid rgba(255,159,10,.1)">→ ${c}</div>`).join("")}
+</div>
+<div style="font-size:11px;color:var(--t3);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.04)">📝 Las legumbres (alubias, garbanzos, lentejas, guisantes) son intercambiables entre ellas en la misma cantidad.</div>
+</div>
+
+<div class="sc glass"><div class="sc-l" style="color:var(--rd)">🥩 Proteínas — Cortes simples</div>
+<p style="font-size:11px;color:var(--t3);margin-bottom:8px">Intercambiables entre sí</p>
+<div style="display:grid;grid-template-columns:1fr;gap:4px">
+${PROTS_A.map(p=>`<div style="font-size:13px;color:var(--t2);padding:8px 10px;background:rgba(255,69,58,.05);border-radius:10px;border:1px solid rgba(255,69,58,.1)">→ ${p}</div>`).join("")}
+</div></div>
+
+<div class="sc glass"><div class="sc-l" style="color:var(--rd)">🥩 Proteínas — Combinaciones con huevo</div>
+<p style="font-size:11px;color:var(--t3);margin-bottom:8px">También equivalentes a los anteriores</p>
+<div style="display:grid;grid-template-columns:1fr;gap:4px">
+${PROTS_B.map(p=>`<div style="font-size:13px;color:var(--t2);padding:8px 10px;background:rgba(255,69,58,.05);border-radius:10px;border:1px solid rgba(255,69,58,.1)">→ ${p}</div>`).join("")}
+</div></div>
+
+<div class="sc glass"><div class="sc-l" style="color:var(--gn)">🥗 Verdura</div><p style="font-size:13px;color:var(--t2)">Puedes cambiar cualquier verdura por otra que te guste. Simplemente ve variando.</p></div>
+<div class="sc glass"><div class="sc-l" style="color:var(--in)">🍎 Fruta</div><p style="font-size:13px;color:var(--t2)">4 piezas al día. Puedes sustituir 1 pieza por 2 yogures desnatados sin azúcar añadido.</p></div>
+
+<div class="sc glass"><div class="sc-l" style="color:var(--bl)">🍽️ Comer fuera de casa</div>
+<p style="font-size:11px;color:var(--t3);margin-bottom:8px">Según la pila del día, elige este tipo de menú:</p>
+${[
+{l:"🔋",t:"Pila baja",d:"1º plato: mayormente verdura<br>2º plato: carne o pescado con verduras",ex:"Ensalada + dorada con verduras · Caldo verduras + pollo con ensalada"},
+{l:"🔋🔋",t:"Pila media",d:"1º plato: mayormente verdura<br>2º plato: proteína con algo de hidratos",ex:"Ensalada + dorada con patatas · Caldo + garbanzos con pollo"},
+{l:"🔋🔋🔋",t:"Pila alta",d:"1º plato: mayormente verdura<br>2º plato: hidratos con algo de proteína",ex:"Ensalada + pasta con carne · Pimientos + pollo con patatas y pan"},
+{l:"🔋🔋🔋🔋",t:"Pila máxima",d:"1º plato: mayormente verdura<br>2º plato: hidratos con proteína + pan o postre",ex:"Tosta atún + pasta con ajo + pan · Sopa fideos + garbanzos con patata + pan"}
+].map((r,i)=>`<div style="padding:10px 0;${i>0?"border-top:1px solid rgba(255,255,255,.06)":""}">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:14px">${r.l}</span><span style="font-size:13px;font-weight:600;color:var(--t)">${r.t}</span></div>
+<div style="font-size:12px;color:var(--t2);line-height:1.6">${r.d}</div>
+<div style="font-size:11px;color:var(--t3);margin-top:4px">💡 ${r.ex}</div>
+</div>`).join("")}
+</div>
+
+<div class="sc glass"><div class="sc-l" style="color:var(--t3)">📝 Notas generales</div><ul class="nl">
+<li>Todos los pesos son en crudo salvo legumbres (cocidas)</li>
+<li>Técnicas culinarias: respeta cantidades, cocina como quieras</li>
+<li>Aceite de oliva: mejor virgen extra</li>
+<li>Sal: sin problema, prioriza especias, vinagre, limón</li>
+<li>Bebidas zero: ok de vez en cuando, prioriza agua</li>
+<li>Pan: del tipo que quieras (integral, blanco, semillas…)</li>
+<li>Yogures: puedes sustituir 1 fruta al día por 2 yogures desnatados sin azúcar</li>
+<li>Zumos: si están pautados, que tengan ~12g CH cada 100ml</li>
+</ul></div>`}
+
+function printWeek(){
+const w=S.w,days=WP[w];
+const allIngredients=[];
+let menuHTML='',recipeHTML='';
+days.forEach((d,i)=>{
+const bf=BF[d.bf],lu=LU[d.lu],di=DI[d.di];
+menuHTML+=`<tr><td style="font-weight:700;padding:6px 10px;border:1px solid #ddd">${DL[i]}</td><td style="padding:6px 10px;border:1px solid #ddd">${dots(d.pila)}</td><td style="padding:6px 10px;border:1px solid #ddd">${bf.n}</td><td style="padding:6px 10px;border:1px solid #ddd">${lu.n}</td><td style="padding:6px 10px;border:1px solid #ddd">${di.n}</td></tr>`;
+[bf,lu,di].forEach(m=>{
+if(m.ig){m.ig.replace(/<br>/g,' · ').replace(/<[^>]+>/g,'').split(' · ').forEach(ing=>{const t=ing.trim();if(t&&t.length>1)allIngredients.push(t)})}
+});
+recipeHTML+=`<div style="page-break-inside:avoid;margin-bottom:16px;padding:12px;border:1px solid #ddd;border-radius:8px"><h3 style="margin:0 0 6px;font-size:14px;color:#333">${DL[i]} — ${dots(d.pila)}</h3>`;
+recipeHTML+=`<p style="margin:4px 0;font-size:12px"><b>Desayuno:</b> ${bf.n}</p><p style="font-size:11px;color:#666;margin:2px 0">${bf.ig||''}</p>`;
+recipeHTML+=`<p style="margin:8px 0 4px;font-size:12px"><b>Comida:</b> ${lu.n}</p><p style="font-size:11px;color:#666;margin:2px 0"><em>Ingredientes:</em> ${(lu.ig||'').replace(/<[^>]+>/g,'')}</p><p style="font-size:11px;color:#444;margin:2px 0"><em>Elaboración:</em> ${(lu.el||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()}</p>`;
+recipeHTML+=`<p style="margin:8px 0 4px;font-size:12px"><b>Cena:</b> ${di.n}</p><p style="font-size:11px;color:#666;margin:2px 0"><em>Ingredientes:</em> ${(di.ig||'').replace(/<[^>]+>/g,'')}</p><p style="font-size:11px;color:#444;margin:2px 0"><em>Elaboración:</em> ${(di.el||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()}</p>`;
+recipeHTML+=`</div>`;
+});
+const unique=new Map();
+allIngredients.forEach(ing=>{const clean=ing.replace(/^\d+[\s,.]*/,'').replace(/^[gG]\s+de\s+/,'').toLowerCase().trim();
+const key=clean.replace(/\d+/g,'').replace(/[gml]+\s*/,'').trim();
+if(!unique.has(key))unique.set(key,[]);unique.get(key).push(ing)});
+let shopHTML='';
+unique.forEach((items,key)=>{shopHTML+=`<li style="font-size:12px;padding:3px 0;border-bottom:1px solid #eee">${items[0]}${items.length>1?' <span style="color:#999">(×'+items.length+')</span>':''}</li>`});
+
+const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><title>Semana ${w} — Plan JM</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,Helvetica,Arial,sans-serif;padding:20px;color:#222;font-size:13px;max-width:900px;margin:0 auto}
+h1{font-size:20px;margin-bottom:4px}h2{font-size:16px;margin:20px 0 10px;padding-bottom:4px;border-bottom:2px solid #333}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px}th{background:#f5f5f5;padding:6px 10px;border:1px solid #ddd;text-align:left;font-size:11px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media print{body{padding:10px;font-size:11px}h1{font-size:16px}h2{font-size:14px}.no-print{display:none}.page-break{page-break-before:always}}
+@media(max-width:600px){.cols{grid-template-columns:1fr}}
+</style></head><body>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<div><h1>Plan Menú — Semana ${w}</h1><p style="color:#666">José María · Aumenta+ · ${APP_V} (${APP_DATE})</p></div>
+<button class="no-print" onclick="window.print()" style="padding:10px 20px;font-size:14px;background:#0A84FF;color:#fff;border:none;border-radius:8px;cursor:pointer">🖨️ Imprimir</button>
+</div>
+
+<h2>📅 Menú semanal</h2>
+<table><tr><th>Día</th><th>Pila</th><th>Desayuno</th><th>Comida</th><th>Cena</th></tr>${menuHTML}</table>
+<p style="font-size:11px;color:#666;margin-bottom:6px">+ 4 piezas de fruta al día como merienda</p>
+
+<h2>🛒 Lista de la compra</h2>
+<div class="cols"><div><ul style="list-style:none;padding:0">${shopHTML}</ul></div></div>
+
+<div class="page-break"></div>
+<h2>👨‍🍳 Recetas de la semana</h2>
+${recipeHTML}
+
+<p style="margin-top:20px;font-size:10px;color:#999;text-align:center">Plan de Menú y Suplementación — José María ${APP_V} (${APP_DATE}) · Aumenta+</p>
+</body></html>`;
+
+const w2=window.open('','_blank');
+if(w2){w2.document.write(html);w2.document.close()}else{alert('Permite ventanas emergentes para imprimir')}
+}
+
+const VW=["week","menus","recetas","supps","equiv"];
+document.querySelectorAll(".tb").forEach(b=>{b.addEventListener("click",()=>{document.querySelectorAll(".tb").forEach(x=>x.classList.remove("on"));b.classList.add("on");S.v=b.dataset.v;VW.forEach(v=>{const el=$("v"+v.charAt(0).toUpperCase()+v.slice(1));if(el)el.classList.toggle("hidden",S.v!==v)});$("plannerW").classList.toggle("hidden",S.v!=="week");document.querySelector(".week-nav").style.display=(S.v==="week"||S.v==="supps")?"flex":"none";document.querySelector(".hdr-actions").style.display=S.v==="week"?"flex":"none";if(S.v==="menus")renderMenus();if(S.v==="recetas")renderRecetas();if(S.v==="supps"){renderSupps();updWlabel()}if(S.v==="equiv")renderEquiv()})});
+wSel.addEventListener("change",e=>{S.w=+e.target.value;save();updWlabel();renderPlanner();renderWeek();if(S.v==="supps")renderSupps()});
+rebuildWsel();
+$("appVer").textContent="José María · "+APP_V+" · "+APP_DATE;
+renderPlanner();renderWeek();
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){})}</script>
+</body>
+</html>
